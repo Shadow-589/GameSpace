@@ -1,6 +1,5 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-
 /**
  *
  * CARGAR IMAGENES
@@ -61,6 +60,9 @@ imgWin.src = "../img/You win.png";
 const imgGameover = new Image();
 imgGameover.src = "../img/GAMEOVER.png";
 
+const imgEscudo = new Image();
+imgEscudo.src = "../img/escudo.png";
+
 /**
  *
  * POSICION INICIAL DEL JUGADOR
@@ -82,6 +84,7 @@ let saturnos = [];
 let uranos = [];
 let neptunos = [];
 let coinds = [];
+let escudos = [];
 let score = 0;
 let vidas = 5;
 let universos = 0;
@@ -89,6 +92,9 @@ let nivel = 1;
 let gameStart = false;
 let gameOver = false;
 let gameWin = false;
+let escudoActivo = false;
+let duracionEscudo = 300;
+let contadorEscudo = 0;
 
 // CREAR ENEMIGOS
 function crearSoles() {
@@ -215,10 +221,23 @@ function crearAmigos() {
     vy: velocidad,
   });
 }
+//crear Universos Enbotellados
 function crearCoinds() {
   let posicion = Math.random() * (800 - 45);
   let velocidad = Math.random() * (5 - 2) + 2;
   coinds.push({
+    x: posicion,
+    y: -50,
+    w: 40,
+    h: 40,
+    vy: velocidad,
+  });
+}
+//Crear Escudos
+function crearEscudos() {
+  let posicion = Math.random() * (800 - 45);
+  let velocidad = Math.random() * (5 - 2) + 2;
+  escudos.push({
     x: posicion,
     y: -50,
     w: 40,
@@ -244,6 +263,7 @@ document.addEventListener("keydown", (e) => {
 
 function update() {
   if (gameOver || gameWin) return;
+
   // Reiniciamos velocidad horizontal
   player.vx = 0;
 
@@ -251,194 +271,192 @@ function update() {
   if (keys["ArrowLeft"]) player.vx = -4;
   else if (keys["ArrowRight"]) player.vx = 4;
 
-  // Movimiento vertical del jugador
+  // Movimiento vertical
   if (keys["ArrowDown"]) player.y += 4;
   if (keys["ArrowUp"]) player.y -= 4;
 
   // Aplicar movimiento horizontal
   player.x += player.vx;
 
-  // Evitar que el personaje salga de la pantalla
+  // Evitar que el jugador salga de la pantalla
   if (player.x < 0) player.x = 0;
   if (player.x + player.w > 800) player.x = 800 - player.w;
   if (player.y + player.h > 600) player.y = 600 - player.h;
   if (player.y < 0) player.y = 0;
 
-  //MOVER METEORITOS
-  meteoritos.forEach((meteorito) => (meteorito.y += meteorito.vy));
-  meteoritos = meteoritos.filter((meteorito) => meteorito.y < 600);
-  if (Math.random() < 0.02) crearMeteoritos();
-  //MOVER COMETAS
-  cometas.forEach((cometa) => (cometa.y += cometa.vy));
-  cometas = cometas.filter((cometa) => cometa.y < 600);
-  if (Math.random() < 0.001) crearCometas();
-  //MOVER MERCURIO
-  mercurios.forEach((mercurio) => (mercurio.y += mercurio.vy));
-  mercurios = mercurios.filter((mercurio) => mercurio.y < 600);
-  if (Math.random() < 0.02) crearMercurios();
-  //MOVER MARTE
-  martes.forEach((marte) => (marte.y += marte.vy));
-  martes = martes.filter((marte) => marte.y < 600);
-  if (Math.random() < 0.001) crearMartes();
-  //MOVER VENUS
-  venus.forEach((venu) => (venu.y += venu.vy));
-  venus = venus.filter((venu) => venu.y < 600);
-  if (Math.random() < 0.001) crearVenus();
-  //MOVER TIERRA
-  tierras.forEach((tierra) => (tierra.y += tierra.vy));
-  tierras = tierras.filter((tierra) => tierra.y < 600);
-  if (Math.random() < 0.02) crearTierras();
-  //MOVER NEPTUNO
-  neptunos.forEach((neptuno) => (neptuno.y += neptuno.vy));
-  neptunos = neptunos.filter((neptuno) => neptuno.y < 600);
-  if (Math.random() < 0.02) crearNeptunos();
-  //MOVER URANO
-  uranos.forEach((urano) => (urano.y += urano.vy));
-  uranos = uranos.filter((urano) => urano.y < 600);
-  if (Math.random() < 0.002) crearUranos();
-  //MOVER SATURNO
-  saturnos.forEach((saturno) => (saturno.y += saturno.vy));
-  saturnos = saturnos.filter((saturno) => saturno.y < 600);
-  if (Math.random() < 0.003) crearSaturnos();
-  //MOVER JUPITER
-  jupiters.forEach((jupiter) => (jupiter.y += jupiter.vy));
-  jupiters = jupiters.filter((jupiter) => jupiter.y < 600);
-  if (Math.random() < 0.005) crearJupiters();
-  // MOVER SOLES
-  soles.forEach((sol) => (sol.y += sol.vy));
-  soles = soles.filter((sol) => sol.y < 600);
-  if (Math.random() < 0.001) crearSoles();
+  // --- GENERAR Y MOVER ENEMIGOS SEGÚN NIVEL ---
+  if (nivel === 1) {
+    // Mercurio
+    mercurios.forEach((m) => (m.y += m.vy));
+    mercurios = mercurios.filter((m) => m.y < 600);
+    if (Math.random() < 0.02) crearMercurios();
 
-  // MOVER AMIGOS
-  amigos.forEach((amigo) => (amigo.y += amigo.vy));
-  amigos = amigos.filter((amigo) => amigo.y < 600);
-  if (Math.random() < 0.005) crearAmigos();
-  // MOVER COINDS
-  coinds.forEach((coind) => (coind.y += coind.vy));
-  coinds = coinds.filter((coind) => coind.y < 600);
+    // Marte
+    martes.forEach((m) => (m.y += m.vy));
+    martes = martes.filter((m) => m.y < 600);
+    if (Math.random() < 0.001) crearMartes();
+
+    // Venus
+    venus.forEach((v) => (v.y += v.vy));
+    venus = venus.filter((v) => v.y < 600);
+    if (Math.random() < 0.001) crearVenus();
+  }
+
+  if (nivel === 2) {
+    // Tierra
+    tierras.forEach((t) => (t.y += t.vy));
+    tierras = tierras.filter((t) => t.y < 600);
+    if (Math.random() < 0.02) crearTierras();
+
+    // Neptuno
+    neptunos.forEach((n) => (n.y += n.vy));
+    neptunos = neptunos.filter((n) => n.y < 600);
+    if (Math.random() < 0.02) crearNeptunos();
+
+    // Urano
+    uranos.forEach((u) => (u.y += u.vy));
+    uranos = uranos.filter((u) => u.y < 600);
+    if (Math.random() < 0.002) crearUranos();
+
+    // Saturno
+    saturnos.forEach((s) => (s.y += s.vy));
+    saturnos = saturnos.filter((s) => s.y < 600);
+    if (Math.random() < 0.003) crearSaturnos();
+  }
+
+  if (nivel === 3) {
+    // Meteoritos
+    meteoritos.forEach((m) => (m.y += m.vy));
+    meteoritos = meteoritos.filter((m) => m.y < 600);
+    if (Math.random() < 0.02) crearMeteoritos();
+
+    // Cometas
+    cometas.forEach((c) => (c.y += c.vy));
+    cometas = cometas.filter((c) => c.y < 600);
+    if (Math.random() < 0.001) crearCometas();
+
+    // Júpiter
+    jupiters.forEach((j) => (j.y += j.vy));
+    jupiters = jupiters.filter((j) => j.y < 600);
+    if (Math.random() < 0.005) crearJupiters();
+
+    // Soles
+    soles.forEach((s) => (s.y += s.vy));
+    soles = soles.filter((s) => s.y < 600);
+    if (Math.random() < 0.001) crearSoles();
+  }
+
+  // --- Items (vidas, coinds, escudos) ---
+  amigos.forEach((a) => (a.y += a.vy));
+  amigos = amigos.filter((a) => a.y < 600);
+  if (Math.random() < 0.01) crearAmigos();
+
+  coinds.forEach((c) => (c.y += c.vy));
+  coinds = coinds.filter((c) => c.y < 600);
   if (Math.random() < 0.007) crearCoinds();
 
-  // COLISIONES de los Meteoritos
-  meteoritos.forEach((meteorito, indice) => {
-    if (colision(player, meteorito)) {
-      vidas--;
-      meteoritos.splice(indice, 1);
-    }
-  });
-  //COLISIONES de los cometas
-  cometas.forEach((cometa, indice) => {
-    if (colision(player, cometa)) {
-      vidas--;
-      cometas.splice(indice, 1);
-    }
-  });
-  //COLISIONES de Mercurio
-  mercurios.forEach((mercurio, indice) => {
-    if (colision(player, mercurio)) {
-      vidas--;
-      mercurios.splice(indice, 1);
-    }
-  });
-  //COLISIONES de Marte
-  martes.forEach((marte, indice) => {
-    if (colision(player, marte)) {
-      vidas--;
-      martes.splice(indice, 1);
-    }
-  });
-  //COLISIONES de Venus
-  venus.forEach((venu, indice) => {
-    if (colision(player, venu)) {
-      vidas--;
-      venus.splice(indice, 1);
-    }
-  });
-  //COLISIONES de la Tierra
-  tierras.forEach((tierra, indice) => {
-    if (colision(player, tierra)) {
-      vidas - 2;
-      tierras.splice(indice, 1);
-    }
-  });
-  //COLISIONES de Neptuno
-  neptunos.forEach((neptuno, indice) => {
-    if (colision(player, neptuno)) {
-      vidas - 2;
-      neptunos.splice(indice, 1);
-    }
-  });
-  //COLISIONES de Urano
-  uranos.forEach((urano, indice) => {
-    if (colision(player, urano)) {
-      vidas - 3;
-      uranos.splice(indice, 1);
-    }
-  });
-  //COLISIONES de  Saturno
-  saturnos.forEach((saturno, indice) => {
-    if (colision(player, saturno)) {
-      vidas - 3;
-      saturnos.splice(indice, 1);
-    }
-  });
-  //COLISIONES de Jupiter
-  jupiters.forEach((jupiter, indice) => {
-    if (colision(player, jupiter)) {
-      vidas - 4;
-      jupiters.splice(indice, 1);
-    }
-  });
-  //COLISIONES del Sol
-  soles.forEach((sol, indice) => {
-    if (colision(player, sol)) {
-      vidas - 4;
-      soles.splice(indice, 1);
-    }
-  });
-  //COLISIONES DE LAS VIDAS
-  amigos.forEach((amigo, indice) => {
+  escudos.forEach((e) => (e.y += e.vy));
+  escudos = escudos.filter((e) => e.y < 600);
+  if (Math.random() < 0.005) crearEscudos();
+
+  // --- COLISIONES ---
+  // Vidas
+  amigos.forEach((amigo, i) => {
     if (colision(player, amigo)) {
       vidas++;
-      amigos.splice(indice, 1);
+      amigos.splice(i, 1);
     }
   });
-  //WIN OR GAME OVER
-  if (vidas <= 0) {
-    gameOver = true;
-  } else if (universos >= 20) {
-    gameWin = true;
+
+  // Escudos
+  escudos.forEach((escudo, i) => {
+    if (colision(player, escudo)) {
+      activarEscudo();
+      escudos.splice(i, 1);
+    }
+  });
+
+  // Enemigos
+  const enemigosPorNivel = {
+    1: [...mercurios, ...martes, ...venus],
+    2: [...tierras, ...neptunos, ...uranos, ...saturnos],
+    3: [...meteoritos, ...cometas, ...jupiters, ...soles],
+  };
+
+  for (const enemigo of enemigosPorNivel[nivel]) {
+    let array;
+    switch (nivel) {
+      case 1:
+        array = [mercurios, martes, venus];
+        break;
+      case 2:
+        array = [tierras, neptunos, uranos, saturnos];
+        break;
+      case 3:
+        array = [meteoritos, cometas, jupiters, soles];
+        break;
+    }
+    for (let arr of array) {
+      arr.forEach((obj, i) => {
+        if (colision(player, obj)) {
+          if (!escudoActivo) {
+            if (obj === tierras) vidas -= 2;
+            else if (obj === jupiters) vidas -= 4;
+            else if ([saturnos, uranos, neptunos].includes(arr)) vidas -= 3;
+            else vidas--;
+          }
+          arr.splice(i, 1);
+        }
+      });
+    }
   }
 
-  //COLISIONES DE LAS COINDS
-  coinds.forEach((coind, indice) => {
+  // Contador del escudo
+  if (escudoActivo) {
+    contadorEscudo--;
+    if (contadorEscudo <= 0) escudoActivo = false;
+  }
+
+  // Win / Game Over
+  if (vidas <= 0) gameOver = true;
+  if (universos >= 20) gameWin = true;
+
+  // Colisiones coinds
+  coinds.forEach((coind, i) => {
     if (colision(player, coind)) {
       universos++;
-      coinds.splice(indice, 1);
-    }
-    if (universos < 5) {
-      nivel = 1;
-    } else if (universos >= 5 && universos < 15) {
-      nivel = 2;
-    } else if (universos >= 15 && universos < 20) {
-      nivel = 3;
+      coinds.splice(i, 1);
     }
   });
 
-  //No dejar que las vidas o los universos superen el limite
+  // Ajustar nivel según universos
+  if (universos < 5) nivel = 1;
+  else if (universos < 15) nivel = 2;
+  else if (universos < 20) nivel = 3;
 
-  if (vidas < 1) {
-    vidas = 0;
-  } else if (universos > 20) {
-    universos = 20;
+  // Limitar valores
+  if (vidas < 0) vidas = 0;
+  if (universos > 20) universos = 20;
+}
+
+function colision(player, objeto) {
+  if (!objeto) {
+    console.warn("Objeto inválido en colision:", objeto);
+    return false;
   }
+  const choque =
+    player.x < objeto.x + objeto.w &&
+    player.x + player.w > objeto.x &&
+    player.y < objeto.y + objeto.h &&
+    player.y + player.h > objeto.y;
+  return choque;
+}
 
-  function colision(player, objeto) {
-    return (
-      player.x < objeto.x + objeto.w &&
-      player.x + player.w > objeto.x &&
-      player.y < objeto.y + objeto.h &&
-      player.y + player.h > objeto.y
-    );
+//FUNCION DE ESCUDO
+function activarEscudo() {
+  if (!escudoActivo) {
+    escudoActivo = true;
+    contadorEscudo = duracionEscudo;
   }
 }
 
@@ -451,6 +469,17 @@ function draw() {
   if (imgFondo.complete) ctx.drawImage(imgFondo, 0, 0, 800, 600);
   if (imgJugador.complete)
     ctx.drawImage(imgJugador, player.x, player.y, player.w, player.h);
+  //Dibujo del escudo con imagen
+  if (escudoActivo && imgEscudo.complete) {
+    const escudoPadding = 10; // Espacio extra alrededor del jugador
+    ctx.drawImage(
+      imgEscudo,
+      player.x - escudoPadding,
+      player.y - escudoPadding,
+      player.w + escudoPadding * 2,
+      player.h + escudoPadding * 2
+    );
+  }
 }
 //Funcion dibujar marcador
 function marcador() {
@@ -459,8 +488,14 @@ function marcador() {
   ctx.font = "16px Arial";
   ctx.fillText("Puntos: " + score, 20, 30);
   ctx.fillText("Vidas: " + vidas, 20, 50);
-  ctx.fillText("Universos: " + universos, 20, 70);
-  ctx.fillText("Nivel: " + nivel, 20, 90);
+  //hacer que el escudo quede en segundos
+  ctx.fillText(
+    "Escudo: " + (escudoActivo ? Math.ceil(contadorEscudo / 60) : 0),
+    20,
+    70
+  );
+  ctx.fillText("Universos: " + universos, 20, 90);
+  ctx.fillText("Nivel: " + nivel, 20, 110);
 }
 //FUNCION PORTADA
 function portada() {
@@ -558,7 +593,13 @@ function items() {
     if (imgCoind.complete)
       ctx.drawImage(imgCoind, coind.x, coind.y, coind.w, coind.h);
   });
+  //Dibujar Escudos
+  escudos.forEach((escudo) => {
+    if (imgEscudo.complete)
+      ctx.drawImage(imgEscudo, escudo.x, escudo.y, escudo.w, escudo.h);
+  });
 }
+
 //funcion para reiniciar variables
 function reiniciarJuego() {
   vidas = 5;
@@ -583,6 +624,10 @@ function reiniciarJuego() {
   gameOver = false;
   gameWin = false;
   gameStart = false;
+
+  escudoActivo = false;
+  duracionEscudo = 300;
+  contadorEscudo = 0;
 }
 
 function loop() {
@@ -605,7 +650,7 @@ function loop() {
       ctx.drawImage(imgGameover, 170, 200, 500, 174);
     }
     if (gameWin) {
-      ctx.drawImage(imgWin, 170, 200, 500, 174);
+      ctx.drawImage(imgWin, 150, 200, 500, 174);
     }
   } else {
     portada();
