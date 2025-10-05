@@ -63,6 +63,15 @@ imgGameover.src = "../img/GAMEOVER.png";
 const imgEscudo = new Image();
 imgEscudo.src = "../img/escudo.png";
 
+//Musica de Fondo
+const musicaFondo = new Audio("audio/fondo.mp3");
+musicaFondo.loop = true; // Para que se repita infinitamente
+musicaFondo.volume = 0.5; // Volumen de 0 a 1
+//Musica de derrota
+const sonidoGameOver = new Audio("audio/gameover.mp3");
+//Musica de victoria
+const sonidoWin = new Audio("audio/win.mp3");
+
 /**
  *
  * POSICION INICIAL DEL JUGADOR
@@ -252,6 +261,7 @@ document.addEventListener("keyup", (e) => (keys[e.key] = false));
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     gameStart = true;
+    musicaFondo.play();
   }
 });
 //REINICIAR JUEGO
@@ -648,9 +658,13 @@ function loop() {
     // Dibujar win // GAME OVER
     if (gameOver) {
       ctx.drawImage(imgGameover, 170, 200, 500, 174);
+      musicaFondo.pause();
+      sonidoGameOver.play();
     }
     if (gameWin) {
       ctx.drawImage(imgWin, 150, 200, 500, 174);
+      musicaFondo.pause();
+      sonidoWin.play();
     }
   } else {
     portada();
