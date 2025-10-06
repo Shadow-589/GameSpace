@@ -7,61 +7,61 @@ const ctx = canvas.getContext("2d");
  */
 
 const imgJugador = new Image();
-imgJugador.src = "../img/jugador.png";
+imgJugador.src = "img/jugador.png";
 
 const imgCometa = new Image();
-imgCometa.src = "../img/cometa.png";
+imgCometa.src = "img/cometa.png";
 
 const imgMeteorito = new Image();
-imgMeteorito.src = "../img/meteorito.png";
+imgMeteorito.src = "img/meteorito.png";
 
 const imgSol = new Image();
-imgSol.src = "../img/sol.png";
+imgSol.src = "img/sol.png";
 
 const imgMercurio = new Image();
-imgMercurio.src = "../img/mercurio.png";
+imgMercurio.src = "img/mercurio.png";
 
 const imgVenus = new Image();
-imgVenus.src = "../img/venus.png";
+imgVenus.src = "img/venus.png";
 
 const imgTierra = new Image();
-imgTierra.src = "../img/tierra.png";
+imgTierra.src = "img/tierra.png";
 
 const imgMarte = new Image();
-imgMarte.src = "../img/marte.png";
+imgMarte.src = "img/marte.png";
 
 const imgJupiter = new Image();
-imgJupiter.src = "../img/jupiter.png";
+imgJupiter.src = "img/jupiter.png";
 
 const imgSaturno = new Image();
-imgSaturno.src = "../img/saturno.png";
+imgSaturno.src = "img/saturno.png";
 
 const imgUrano = new Image();
-imgUrano.src = "../img/urano.png";
+imgUrano.src = "img/urano.png";
 
 const imgNeptuno = new Image();
-imgNeptuno.src = "../img/neptuno.png";
+imgNeptuno.src = "img/neptuno.png";
 
 const imgCoind = new Image();
-imgCoind.src = "../img/universos.png";
+imgCoind.src = "img/universos.png";
 
 const imgEstrella = new Image();
-imgEstrella.src = "../img/estrella.png";
+imgEstrella.src = "img/estrella.png";
 
 const imgFondo = new Image();
-imgFondo.src = "../img/fondo.png";
+imgFondo.src = "img/fondo.png";
 
 const imgPortada = new Image();
-imgPortada.src = "../img/Instrucciones.jpg";
+imgPortada.src = "img/Instrucciones.jpg";
 
 const imgWin = new Image();
-imgWin.src = "../img/You win.png";
+imgWin.src = "img/You win.png";
 
 const imgGameover = new Image();
-imgGameover.src = "../img/GAMEOVER.png";
+imgGameover.src = "img/GAMEOVER.png";
 
 const imgEscudo = new Image();
-imgEscudo.src = "../img/escudo.png";
+imgEscudo.src = "img/escudo.png";
 
 //Musica de Fondo
 const musicaFondo = new Audio("audio/fondo.mp3");
@@ -268,6 +268,7 @@ document.addEventListener("keydown", (e) => {
 document.addEventListener("keydown", (e) => {
   if ((gameOver || gameWin) && e.key === "Enter") {
     reiniciarJuego();
+    musicaFondo.play();
   }
 });
 
